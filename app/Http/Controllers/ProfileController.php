@@ -3,22 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+
     /**
      * Display the user's profile form.
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $usuario = Auth::user();
+        return view("profile.edit", compact("usuario"));
     }
 
     /**
@@ -26,15 +28,27 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = auth()->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+        if($request->img != null) {
+            $source = file_get_contents($request->file('pfp')->path());
+            $base64 = base64_encode($source);
+            $blob = 'data:png;base64,' . $base64;
+            $img = $blob;
+        }else
+            $img = $user->img;
 
-        $request->user()->save();
+        //más fácil hacerlo así que bien, pero no encontraba otra forma
+        $user->update([
+            'name' => $request->name ?? $user->name,
+            'email' => $request->email ?? $user->email,
+            'password' => $request->password != null ? Hash::make($request->password) : $user->password,
+            'info' => $request->info ?? $user->info,
+            'pfp' => $img,
+            'admin' => $user->admin,
+        ]);
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return redirect(route('usuario.index'));
     }
 
     /**
@@ -42,10 +56,6 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
 
         Auth::logout();

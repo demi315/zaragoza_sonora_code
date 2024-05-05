@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicacionController;
+use \App\Http\Controllers\UsuarioController;
+use App\Models\Publicacion;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -14,9 +18,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [PublicacionController::class,'index']);
+
+Route::resource("usuario", UsuarioController::class)->middleware('auth');
+
+Route::resource("publicacion", PublicacionController::class);
+
+Route::get('publicacion/{tipo}/listado', [PublicacionController::class,'listado'])->name('publicacion.listado');
+
+Route::get('publicacion/{tipo}/crear', [PublicacionController::class,'createArguments'])->name('publicacion.crear');
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
