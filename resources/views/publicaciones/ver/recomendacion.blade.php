@@ -10,8 +10,10 @@
     <div class="flex justify-between">
         <div>
             @auth()
-                @if(auth()->user()->admin == 1)
-                    <a class="btn" href="{{route('publicacion.edit',$publicacion->id)}}">Editar</a>
+                @if(App\Http\Controllers\PublicacionController::estaGuardada($publicacion->id,auth()->user()->id))
+                    <a href="{{route('publicacion.guardar',$publicacion->id)}}" class="btn">Quitar de Guardados</a>
+                @else
+                    <a href="{{route('publicacion.guardar',$publicacion->id)}}" class="btn">Guardar</a>
                 @endif
             @endauth
         </div>

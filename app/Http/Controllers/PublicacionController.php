@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePublicacionRequest;
 use App\Http\Requests\UpdatePublicacionRequest;
 use App\Models\Fecha;
+use App\Models\Guarda;
 use App\Models\Imagen;
 use App\Models\Publicacion;
 use App\Models\Video;
+use Illuminate\Support\Facades\DB;
+use function PHPUnit\Framework\isEmpty;
 
 class PublicacionController extends Controller
 {
@@ -24,7 +27,7 @@ class PublicacionController extends Controller
     }
 
     public function listado(String $tipo){
-        $publicaciones =  Publicacion::where('tipo',$tipo)->limit(10)->get();
+        $publicaciones =  Publicacion::where('tipo',$tipo)->limit(10)->orderByDesc('created_at')->get();
         $media = null;
         switch ($tipo){
             default:
@@ -178,6 +181,43 @@ class PublicacionController extends Controller
         }
 
         return redirect(route('publicacion.show',$publicacion->id));
+    }
+
+    public function guardarPublicacion(int $id_pub)
+    {
+        if($this->estaGuardada($id_pub,auth()->user()->id)) {
+            Guarda::where('id_pub', $id_pub)->where('id_us',auth()->user()->id)->delete();
+        }else{
+            $guardado = new Guarda(['id_pub' => $id_pub, 'id_us' => auth()->user()->id]);
+            $guardado->save();
+        }
+        return redirect(route('publicacion.show',$id_pub));
+    }
+
+    public static function estaGuardada(int $id_pub, int $id_us)
+    {
+        return Guarda::where('id_pub', $id_pub)->where('id_us',$id_us)->first() != null;
+    }
+
+    public function showGuardados(int $id_us)
+    {
+        $publicaciones =  DB::select('select publicaciones.* from publicaciones, guarda where id_us = '.$id_us.' and id = id_pub ORDER BY guarda.created_at DESC');
+        $media = null;
+        return view('publicaciones.guardados', compact('publicaciones','media'));
+    }
+
+    public function showCalendario(int $id_us){
+        $eventos = [];
+        $publicaciones = DB::select('select publicaciones.titulo, fecha.fecha from publicaciones, guarda, fecha where id_us = '.$id_us.' and id = guarda.id_pub and id = fecha.id_pub and tipo = \'evento\' ORDER BY guarda.created_at DESC');
+        dd($publicaciones);
+        foreach($publicaciones as $pub){
+            $eventos = [
+                'title' => $pub->titulo,
+                'start' => $pub->fecha,
+                'end' => $pub->fecha,
+            ];
+        }
+        return view('usuarios.calendario', compact('eventos'));
     }
 
     /**

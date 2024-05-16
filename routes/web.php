@@ -28,6 +28,12 @@ Route::get('publicacion/{tipo}/listado', [PublicacionController::class,'listado'
 
 Route::get('publicacion/{tipo}/crear', [PublicacionController::class,'createArguments'])->name('publicacion.crear');
 
+Route::get('publicacion/{id_pub}/guardar', [PublicacionController::class,'guardarPublicacion'])->name('publicacion.guardar')->middleware('auth');
+
+Route::get('usuario/{id_us}/guardado', [PublicacionController::class,'showGuardados'])->name('usuario.guardados')->middleware('auth');
+
+Route::get('usuario/{id_us}/calendario', [PublicacionController::class,'showCalendario'])->name('usuario.calendario')->middleware('auth');
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');

@@ -20,8 +20,10 @@
         </div>
         <div>
             @auth()
-                @if(auth()->user()->admin == 0)
-                    <h3 class="btn">Guardar</h3>
+                @if(App\Http\Controllers\PublicacionController::estaGuardada($publicacion->id,auth()->user()->id))
+                    <a href="{{route('publicacion.guardar',$publicacion->id)}}" class="btn">Quitar de Guardados</a>
+                @else
+                    <a href="{{route('publicacion.guardar',$publicacion->id)}}" class="btn">Guardar</a>
                 @endif
             @endauth
         </div>

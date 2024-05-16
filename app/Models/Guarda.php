@@ -11,5 +11,9 @@ class Guarda extends Model
 
     protected $table = "guarda";
 
+    protected $primaryKey = ['id_us', 'id_pub'];
+
+    public $incrementing = false;
+
     protected $fillable = ['id_us','id_pub'];
 }
