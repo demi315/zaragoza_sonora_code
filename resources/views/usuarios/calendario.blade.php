@@ -6,7 +6,7 @@
             width: 100vw;
         }
     </style>
-    <a class="btn" href="{{url()->previous()}}">Atrás</a>
+    <a class="btn glass bg-gray-300 hover:bg-gray-400 text-black" href="{{url()->previous()}}">Atrás</a>
     <div id="calendario" class="h-auto w-auto">
         @push('scripts')
             <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>

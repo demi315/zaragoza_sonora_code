@@ -35,8 +35,9 @@ class PublicacionController extends Controller
         $publicaciones =  Publicacion::where('tipo',$tipo)->limit(10)->orderByDesc('created_at')->get();
         foreach ($publicaciones as &$pub){
             $pub['media'] = Imagen::where('id_pub', $pub->id)->first()->img;
+            $pub->texto = substr($pub->texto,0,100) . '...';
         }
-        return view('publicaciones.listado', compact('publicaciones'));
+        return view('publicaciones.listado', compact('publicaciones','tipo'));
     }
 
     public function listadoFiltrado(FormRequest $request){
@@ -47,8 +48,10 @@ class PublicacionController extends Controller
         foreach ($publicaciones as &$pub){
             //dd($pub);
             $pub->media = Imagen::where('id_pub', $pub->id)->first()->img;
+            $pub->texto = substr($pub->texto,0,100) . '...';
         }
-        return view('publicaciones.listado', compact('publicaciones'));
+        $tipo = $request->tipo;
+        return view('publicaciones.listado', compact('publicaciones', 'tipo'));
     }
 
     /**
@@ -104,6 +107,7 @@ class PublicacionController extends Controller
                 $vid->vid = $blob;
                 $vid->id_pub = $pub->id;
                 $vid->save();
+
                 $img = new Imagen();
                 $path = $request->img->path();
                 $source = file_get_contents($path);
@@ -186,6 +190,14 @@ class PublicacionController extends Controller
                     $blob = 'data:mp4;base64,' . $base64;
                     $vid->update(['_method' => 'PATCH', 'vid' => $blob]);
                 }
+                if($request->img != null){
+                    $img = Imagen::where('id_pub', $publicacion->id)->first();
+                    $path = $request->img->path();
+                    $source = file_get_contents($path);
+                    $base64 = base64_encode($source);
+                    $blob = 'data:png;base64,' . $base64;
+                    $img->update(['_method' => 'PATCH', 'img' => $blob]);
+                }
             break;
         }
 
@@ -213,6 +225,7 @@ class PublicacionController extends Controller
         $publicaciones =  DB::select('select publicaciones.* from publicaciones, guarda where id_us = '.$id_us.' and id = id_pub ORDER BY guarda.created_at DESC');
         foreach ($publicaciones as &$pub){
             $pub->media = Imagen::where('id_pub', $pub->id)->first()->img;
+            $pub->texto = substr($pub->texto,0,100) . '...';
         }
         return view('publicaciones.guardados', compact('publicaciones'));
     }

@@ -9,6 +9,7 @@
 @endsection
 
 @section('contenido')
+    <div class="flex flex-col justify-center items-center pb-4">
     <form method="POST" action="{{route('profile.update')}}" enctype="multipart/form-data">
         @csrf
         @method('PATCH')
@@ -66,18 +67,18 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="btn" href="{{route('usuario.index')}}">Cancelar</a>
-            <x-primary-button class="ms-4">
-                {{ __('Guardar') }}
-            </x-primary-button>
+        <div class="flex items-center justify-between mt-4">
+            <a class="btn  btn-sm glass bg-gray-300 hover:bg-gray-400 text-black" href="{{route('usuario.index')}}">Cancelar</a>
+            <input type="submit" class="btn  btn-sm glass bg-gray-300 hover:bg-gray-400 text-black" value="Guardar">
         </div>
     </form>
     @if($usuario->admin != 1)
-        <form action="{{route("profile.destroy", $usuario->id)}}" method="POST">
+        <form action="{{route("profile.destroy", $usuario->id)}}" method="POST" class="mt-6">
             @csrf
             @method("DELETE")
-            <x-primary-button>Eliminar Cuenta</x-primary-button>
+            <input type="submit" class="btn bg-red-600 hover:bg-red-700 text-black" value="ELIMINAR CUENTA">
         </form>
     @endif
+    </div>
+
 @endsection

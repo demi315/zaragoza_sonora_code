@@ -9,6 +9,7 @@
 @endsection
 
 @section('contenido')
+    <div class="flex flex-col justify-center items-center pb-4">
     <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
         @csrf
 
@@ -69,16 +70,13 @@
         </div>
 
         <div class="flex items-center justify-between mt-4">
-            <a href="/" class="btn ">Cancelar</a>
-            <div>
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                    {{ __('Already registered?') }}
-                </a>
+            <a href="/" class="btn  btn-sm glass bg-gray-300 hover:bg-gray-400 text-black">Cancelar</a>
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+                {{ __('¿Ya registrado?') }}
+            </a>
 
-                <x-primary-button class="ms-4">
-                    {{ __('Aceptar') }}
-                </x-primary-button>
-            </div>
+            <input type="submit" class="btn  btn-sm glass bg-gray-300 hover:bg-gray-400 text-black" value="Crear Cuenta">
         </div>
     </form>
+    </div>
 @endsection

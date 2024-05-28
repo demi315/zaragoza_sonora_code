@@ -9,7 +9,7 @@
     <!--Con esto se llama a los estilos de la página-->
     @vite("resources/css/app.css")
 </head>
-<body>
+<body style="background-color: #ddcea0; color: black; min-width: 90vw; min-height: 100vh;">
 
 <x-layout.header_sesion />
 

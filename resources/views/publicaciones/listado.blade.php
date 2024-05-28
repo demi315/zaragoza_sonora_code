@@ -1,35 +1,35 @@
 @extends("layouts.listado")
 
 @section("contenido")
-    <div id="filtros">
-        <details>
-            <summary>Filtros</summary>
-            <form method="post" action="{{route('publicacion.filtros')}}">
-                @csrf
-                Título <input type="text" name="titulo">
+    <div id="filtros" class="mt-3 mb-1">
+        <form method="post" action="{{route('publicacion.filtros')}}" class="flex flex-row justify-around items-center">
+            @csrf
+            <div>Título <input type="text" name="titulo"></div>
 
-                Orden
-                <select name="orden">
-                    <option value="DESC" selected>Más nuevas primero</option>
-                    <option value="ASC">Más antiguas primero</option>
-                </select>
-                <input type="text" name="tipo" value="{{$publicaciones[0]->tipo}}" hidden>
-                <input type="submit" name="submit" value="Aplicar Filtros" class="btn">
-            </form>
-        </details>
+            <div>Orden
+            <select name="orden">
+                <option value="DESC" selected>Más nuevas primero</option>
+                <option value="ASC">Más antiguas primero</option>
+            </select></div>
+            <input type="text" name="tipo" value="{{$tipo}}" hidden>
+            <input type="submit" name="submit" class="btn glass bg-gray-300 hover:bg-gray-400 text-black" value="Aplicar Filtros">
+        </form>
     </div>
+    <div class="flex flex-col justify-center items-center pb-4">
     @foreach($publicaciones as $publicacion)
-        <a href="{{route('publicacion.show',$publicacion->id)}}"><div class="border-2 border-green-700">
-            <img src="{{$publicacion->media}}" height="150px" width="150px" style="display: inline-block" alt="picture for the post {{$publicacion->titulo}}">
-            <div style="display: inline-block">
-                <h3>{{$publicacion->titulo}}</h3>
+        <div class="flex flex-row justify-center items-center border-2 border-white mt-2 w-5/6"><a href="{{route('publicacion.show',$publicacion->id)}}" class="w-full">
+            <img src="{{$publicacion->media}}" style="display: inline-block" class="w-[177.8px] h-[100px]" alt="picture for the post {{$publicacion->titulo}}">
+            <div style="display: inline-block" class="ml-2">
+                <h3 class="text-2xl font-bold">{{$publicacion->titulo}}</h3>
+                <p>{{$publicacion->texto}}</p>
             </div>
-        </div></a>
+        </a></div>
     @endforeach
+    </div>
 @endsection
 
 @section('h1')
-    @switch($publicaciones[0]->tipo)
+    @switch($tipo)
         @case('resena')
             {{$tipo = 'Reseñas'}}
             @break
