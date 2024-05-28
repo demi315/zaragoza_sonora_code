@@ -4,6 +4,11 @@
     Zaragoza Sonora
 @endsection
 
+@section('titulo')
+    Inicio de Sesión
+@endsection
+
+
 @section('contenido')
     <x-auth-session-status class="mb-4" :status="session('status')" />
 

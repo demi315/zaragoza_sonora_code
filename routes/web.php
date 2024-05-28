@@ -26,7 +26,7 @@ Route::resource("publicacion", PublicacionController::class);
 
 Route::get('publicacion/{tipo}/listado', [PublicacionController::class,'listado'])->name('publicacion.listado');
 
-Route::get('publicacion/{tipo}/crear', [PublicacionController::class,'createArguments'])->name('publicacion.crear');
+Route::get('publicacion/{tipo}/crear', [PublicacionController::class,'createArguments'])->name('publicacion.crear')->middleware('auth');
 
 Route::get('publicacion/{id_pub}/guardar', [PublicacionController::class,'guardarPublicacion'])->name('publicacion.guardar')->middleware('auth');
 
@@ -34,10 +34,8 @@ Route::get('usuario/{id_us}/guardado', [PublicacionController::class,'showGuarda
 
 Route::get('usuario/{id_us}/calendario', [PublicacionController::class,'showCalendario'])->name('usuario.calendario')->middleware('auth');
 
+Route::post('publicacion/filtros', [PublicacionController::class,'listadoFiltrado'])->name('publicacion.filtros');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -4,6 +4,10 @@
     Crear Cuenta
 @endsection
 
+@section('titulo')
+    Crear Cuenta
+@endsection
+
 @section('contenido')
     <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
         @csrf

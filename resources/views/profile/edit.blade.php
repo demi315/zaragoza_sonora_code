@@ -4,8 +4,12 @@
     Editar Perfil
 @endsection
 
+@section('titulo')
+    Editar Perfil
+@endsection
+
 @section('contenido')
-    <form method="POST" action="{{route('profile.update')}}">
+    <form method="POST" action="{{route('profile.update')}}" enctype="multipart/form-data">
         @csrf
         @method('PATCH')
 

@@ -9,6 +9,7 @@ use App\Models\Guarda;
 use App\Models\Imagen;
 use App\Models\Publicacion;
 use App\Models\Video;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 use function PHPUnit\Framework\isEmpty;
 
@@ -20,31 +21,34 @@ class PublicacionController extends Controller
     public function index()
     {
             $res = Publicacion::where('tipo','resena')->orderByDesc('created_at')->first();
+            $res['media'] = Imagen::where('id_pub', $res->id)->first()->img;
             $rec = Publicacion::where('tipo','recomendacion')->orderByDesc('created_at')->first();
+            $rec['media'] = Imagen::where('id_pub', $rec->id)->first()->img;
             $ent = Publicacion::where('tipo','entrevista')->orderByDesc('created_at')->first();
+            $ent['media'] = Imagen::where('id_pub', $ent->id)->first()->img;
             $eve = Publicacion::where('tipo','evento')->orderByDesc('created_at')->first();
+            $eve['media'] = Imagen::where('id_pub', $eve->id)->first()->img;
             return view('publicaciones.index', compact('res','rec','ent','eve'));
     }
 
     public function listado(String $tipo){
         $publicaciones =  Publicacion::where('tipo',$tipo)->limit(10)->orderByDesc('created_at')->get();
-        $media = null;
-        switch ($tipo){
-            default:
-            case 'resena':
-                //rescatar imagenes
-            break;
-            case 'recomendacion':
-                //rescatar imagen
-            break;
-            case 'entrevista':
-                //rescatar video
-            break;
-            case 'evento':
-                //rescatar imagen y fecha
-            break;
+        foreach ($publicaciones as &$pub){
+            $pub['media'] = Imagen::where('id_pub', $pub->id)->first()->img;
         }
-        return view('publicaciones.listado', compact('publicaciones','media'));
+        return view('publicaciones.listado', compact('publicaciones'));
+    }
+
+    public function listadoFiltrado(FormRequest $request){
+        $titulo = htmlspecialchars($request->titulo);
+        $publicaciones =  DB::select('select * from publicaciones where tipo = \''.$request->tipo.'\' AND titulo LIKE  \'%'. $titulo .'%\' ORDER BY created_at ' . $request->orden);
+        //dd($publicaciones);
+        //dd($publicaciones[0]);
+        foreach ($publicaciones as &$pub){
+            //dd($pub);
+            $pub->media = Imagen::where('id_pub', $pub->id)->first()->img;
+        }
+        return view('publicaciones.listado', compact('publicaciones'));
     }
 
     /**
@@ -93,14 +97,21 @@ class PublicacionController extends Controller
             break;
             case 'entrevista':
                 $vid = new Video();
-                /*$path = $request->vid->path();
+                $path = $request->vid->path();
                 $source = file_get_contents($path);
                 $base64 = base64_encode($source);
                 $blob = 'data:mp4;base64,'.$base64;
-                $vid->vid = $blob;*/
-                $vid->vid = '0101';
+                $vid->vid = $blob;
                 $vid->id_pub = $pub->id;
                 $vid->save();
+                $img = new Imagen();
+                $path = $request->img->path();
+                $source = file_get_contents($path);
+                $base64 = base64_encode($source);
+                $blob = 'data:png;base64,'.$base64;
+                $img->img = $blob;
+                $img->id_pub = $pub->id;
+                $img->save();
             break;
         }
 
@@ -116,8 +127,6 @@ class PublicacionController extends Controller
         $media = null;
         switch ($publicacion->tipo){
             case 'resena':
-                $media = Imagen::where('id_pub', $publicacion->id)->first()->img;
-            break;
             case 'recomendacion':
                 $media = Imagen::where('id_pub', $publicacion->id)->first()->img;
             break;
@@ -167,17 +176,17 @@ class PublicacionController extends Controller
                     $blob = 'data:png;base64,' . $base64;
                     $img->update(['_method' => 'PATCH', 'img' => $blob]);
                 }
-                break;
+            break;
             case 'entrevista':
-                $vid = Video::where('id_pub', $publicacion->id)->first()->vid;
-                /*$path = $request->vid->path();
-                $source = file_get_contents($path);
-                $base64 = base64_encode($source);
-                $blob = 'data:mp4;base64,'.$base64;
-                */
-                $blob = '0101';
-                $vid->update(['_method' => 'PATCH', 'vid' => $blob]);
-                break;
+                if($request->vid != null) {
+                    $vid = Video::where('id_pub', $publicacion->id)->first()->vid;
+                    $path = $request->vid->path();
+                    $source = file_get_contents($path);
+                    $base64 = base64_encode($source);
+                    $blob = 'data:mp4;base64,' . $base64;
+                    $vid->update(['_method' => 'PATCH', 'vid' => $blob]);
+                }
+            break;
         }
 
         return redirect(route('publicacion.show',$publicacion->id));
@@ -202,19 +211,23 @@ class PublicacionController extends Controller
     public function showGuardados(int $id_us)
     {
         $publicaciones =  DB::select('select publicaciones.* from publicaciones, guarda where id_us = '.$id_us.' and id = id_pub ORDER BY guarda.created_at DESC');
-        $media = null;
-        return view('publicaciones.guardados', compact('publicaciones','media'));
+        foreach ($publicaciones as &$pub){
+            $pub->media = Imagen::where('id_pub', $pub->id)->first()->img;
+        }
+        return view('publicaciones.guardados', compact('publicaciones'));
     }
 
     public function showCalendario(int $id_us){
         $eventos = [];
-        $publicaciones = DB::select('select publicaciones.titulo, fecha.fecha from publicaciones, guarda, fecha where id_us = '.$id_us.' and id = guarda.id_pub and id = fecha.id_pub and tipo = \'evento\' ORDER BY guarda.created_at DESC');
-        dd($publicaciones);
+        $publicaciones = DB::select('select   publicaciones.titulo, fecha.fecha from publicaciones, guarda, fecha where id_us = '.$id_us.' and id = guarda.id_pub and id = fecha.id_pub and tipo = \'evento\' ORDER BY guarda.created_at DESC');
         foreach($publicaciones as $pub){
-            $eventos = [
+            $exp = explode(' ',$pub->fecha);
+            $fecha = $exp[0] . 'T' . $exp[1];
+            //$titulo = "<a href='{{route(\"publicacion.show\",".$pub->id.")}}'>" . $pub->titulo . "</a>";
+            //dd($titulo);
+            $eventos[] = [
                 'title' => $pub->titulo,
-                'start' => $pub->fecha,
-                'end' => $pub->fecha,
+                'start' => $fecha,
             ];
         }
         return view('usuarios.calendario', compact('eventos'));

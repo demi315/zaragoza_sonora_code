@@ -30,13 +30,13 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
 
-        if($request->img != null) {
+        if($request->pfp != null) {
             $source = file_get_contents($request->file('pfp')->path());
             $base64 = base64_encode($source);
             $blob = 'data:png;base64,' . $base64;
             $img = $blob;
         }else
-            $img = $user->img;
+            $img = $user->pfp;
 
         //más fácil hacerlo así que bien, pero no encontraba otra forma
         $user->update([

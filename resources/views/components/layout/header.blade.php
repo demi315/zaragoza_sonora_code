@@ -9,7 +9,10 @@
         @endguest
         @auth
             <div class="flex flex-row">
-                <a href="{{route('usuario.index')}}"><h3 class="text-xl m-5"> {{auth()->user()->name}}</h3></a>
+                <a href="{{route('usuario.index')}}">
+                    <img height="75px" width="75px" style="border-radius: 50%" alt="user profile picture" src="{{auth()->user()->pfp}}">
+                    <h3 class="text-xl m-5"> {{auth()->user()->name}}</h3>
+                </a>
                 <form action="{{route("logout")}}" method="post">
                     @csrf
                     <button class="btn glass text-white" type="submit">Cerrar Sesión</button>
