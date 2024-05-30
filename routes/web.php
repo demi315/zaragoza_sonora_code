@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicacionController;
 use \App\Http\Controllers\UsuarioController;
@@ -23,6 +24,9 @@ Route::get('/', [PublicacionController::class,'index']);
 Route::resource("usuario", UsuarioController::class)->middleware('auth');
 
 Route::resource("publicacion", PublicacionController::class);
+
+Route::resource("comentario", ComentarioController::class)->middleware('auth');
+
 
 Route::get('publicacion/{tipo}/listado', [PublicacionController::class,'listado'])->name('publicacion.listado');
 

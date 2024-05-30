@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePublicacionRequest;
 use App\Http\Requests\UpdatePublicacionRequest;
+use App\Models\Comentario;
 use App\Models\Fecha;
 use App\Models\Guarda;
 use App\Models\Imagen;
@@ -142,7 +143,9 @@ class PublicacionController extends Controller
                 $media[] = Fecha::where('id_pub', $publicacion->id)->first()->fecha;
             break;
         }
-        return view($view,compact('publicacion','media'));
+        $comentarios = Comentario::where('id_pub', $publicacion->id)->orderByDesc('created_at')->get();
+
+        return view($view,compact('publicacion','media','comentarios'));
     }
 
     /**
