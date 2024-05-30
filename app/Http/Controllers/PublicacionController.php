@@ -186,7 +186,7 @@ class PublicacionController extends Controller
             break;
             case 'entrevista':
                 if($request->vid != null) {
-                    $vid = Video::where('id_pub', $publicacion->id)->first()->vid;
+                    $vid = Video::where('id_pub', $publicacion->id)->first();
                     $path = $request->vid->path();
                     $source = file_get_contents($path);
                     $base64 = base64_encode($source);
